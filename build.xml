@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="BP Galaxy" default="build:clean" basedir="." description="Theme build task">
+
+    <property file="./build.properties"/>
+
+    <php expression="date('F Y')" returnProperty="build.date"/>
+    <php expression="date('Y')" returnProperty="build.year"/>
+
+    <target name="build:bp_galaxy">
+        <echo msg="Creating theme directory"/>
+        <mkdir dir="./.build/bp_galaxy"/>
+
+        <echo msg="Building assets with Webpack"/>
+        <exec command="npm run build" passthru="true" checkreturn="true"/>
+
+        <echo msg="Building theme package"/>
+        <copy todir="./.build/bp_galaxy">
+            <fileset dir="./src">
+                <include name="**/*"/>
+                <exclude name="**/entrypoints.json"/>
+                <exclude name="**/manifest.json"/>
+            </fileset>
+            <filterchain>
+                <replacetokens begintoken="${" endtoken="}">
+                    <token key="build.date" value="${build.date}"/>
+                    <token key="build.year" value="${build.year}"/>
+                    <token key="copyrights" value="${copyrights}"/>
+                    <token key="license.name" value="${license.name}"/>
+                    <token key="license.url" value="${license.url}"/>
+                    <token key="build.version" value="${build.version}"/>
+                    <token key="package" value="${package}"/>
+                    <token key="subpackage" value="${subpackage}"/>
+                    <token key="author.url" value="${author.url}"/>
+                    <token key="author.name" value="${author.name}"/>
+                    <token key="author.email" value="${author.email}"/>
+                </replacetokens>
+            </filterchain>
+        </copy>
+
+        <echo msg="Creating plugin zipfile."/>
+        <zip destfile="./.build/bp_galaxy.zip" basedir="./.build/bp_galaxy"/>
+    </target>
+
+    <target name="build">
+        <echo msg="Creating build directory ./.build"/>
+        <mkdir dir="./.build"/>
+
+        <echo msg="Building each of the extensions"/>
+        <phingcall target="build:bp_galaxy"></phingcall>
+
+    </target>
+
+    <target name="clean">
+        <echo msg="Removing build directory ./.build if exists"/>
+        <delete dir="./.build" includeemptydirs="true"/>
+    </target>
+
+    <target name="build:clean">
+        <echo msg="Creating a clean build."/>
+        <phingcall target="clean"></phingcall>
+        <phingcall target="build"></phingcall>
+    </target>
+
+</project>
