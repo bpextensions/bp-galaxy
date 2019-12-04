@@ -38,7 +38,7 @@
         </copy>
 
         <echo msg="Creating plugin zipfile."/>
-        <zip destfile="./.build/bp_galaxy.zip" basedir="./.build/bp_galaxy"/>
+        <zip destfile="./.build/bp_galaxy_v${build.version}.zip" basedir="./.build/bp_galaxy"/>
     </target>
 
     <target name="build">
